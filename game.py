@@ -31,31 +31,33 @@ class Player:
         self.score += 1
 
 def main(window):
+    continue_playing = True
+
+    winner = None
+
     player = namedtuple("Players", ["X", "O"])(
         Player("X"),
         Player("O")
     )
+
     current_player = random.choice([player.X, player.O])
-    winner = None
+
+    # referring to the index of the cursor position within cursor_position as [a][b]
+    # SHOULD BE CONGRUENT WITH THE DATA-STRUCTURE OF THE BOARD
+    metaposition = [0, 0]
+
+    # positions represented as (y,x) coordinates
+    cursor_position = [
+        [(6, 4), (6, 6), (6, 8)],
+        [(8, 4), (8, 6), (8, 8)],
+        [(10, 4), (10, 6), (10, 8)],
+    ]
 
     board = [
         [None, None, None],
         [None, None, None],
         [None, None, None],
     ]
-
-    # positions represented as (y,x) coordinates
-    cursor_position_matrix = [
-        [(6, 4), (6, 6), (6, 8)],
-        [(8, 4), (8, 6), (8, 8)],
-        [(10, 4), (10, 6), (10, 8)],
-    ]
-
-    # referring to the index of the cursor position within the cursor_position_matrix as [a][b]
-    # SHOULD BE CONGRUENT WITH THE DATA-STRUCTURE OF THE BOARD
-    cursor_position_within_matrix = [0, 0]
-
-    continue_playing = True
 
     # initialize window
     curses.resizeterm(15, 13)
@@ -95,21 +97,20 @@ def main(window):
 
             curses.curs_set(1)
 
-            cursor_position = cursor_position_matrix[cursor_position_within_matrix[0]][cursor_position_within_matrix[1]]
-            window.move(*cursor_position)
+            window.move(*cursor_position[metaposition[0]][metaposition[1]])
 
             match (key := window.getch()):
                 case curses.KEY_UP:
-                    cursor_position_within_matrix[0] = (cursor_position_within_matrix[0] - 1) % 3
+                    metaposition[0] = (metaposition[0] - 1) % 3
                 case curses.KEY_DOWN:
-                    cursor_position_within_matrix[0] = (cursor_position_within_matrix[0] + 1) % 3
+                    metaposition[0] = (metaposition[0] + 1) % 3
                 case curses.KEY_LEFT:
-                    cursor_position_within_matrix[1] = (cursor_position_within_matrix[1] - 1) % 3
+                    metaposition[1] = (metaposition[1] - 1) % 3
                 case curses.KEY_RIGHT:
-                    cursor_position_within_matrix[1] = (cursor_position_within_matrix[1] + 1) % 3
+                    metaposition[1] = (metaposition[1] + 1) % 3
                 case curses.KEY_ENTER | 10:
-                    if board[cursor_position_within_matrix[0]][cursor_position_within_matrix[1]] is None:
-                        board[cursor_position_within_matrix[0]][cursor_position_within_matrix[1]] = current_player
+                    if board[metaposition[0]][metaposition[1]] is None:
+                        board[metaposition[0]][metaposition[1]] = current_player
 
                         current_player = player.X if current_player == player.O else player.O
 
@@ -146,7 +147,7 @@ def main(window):
 
         window.addstr(3, 4, "score")
 
-        window.addstr(7, 1, f"{player.X}:{str(player.X.score)}")
+        window.addstr(7, 2, f"{player.X}:{str(player.X.score)}")
         window.addstr(7, 8, f"{player.O}:{str(player.O.score)}")
 
         if winner:
@@ -174,7 +175,7 @@ def main(window):
                         [None, None, None],
                     ]
 
-                    cursor_position_within_matrix = [0, 0]
+                    metaposition = [0, 0]
 
                     break
 

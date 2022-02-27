@@ -1,15 +1,39 @@
+from collections import namedtuple
 from curses import wrapper
 import curses
 import random
 
+class Player:
+    def __init__(self, name: str):
+        self.name = name
+        self.score = 0
+
+    def __hash__(self):
+        return hash((self.name))
+
+    def __eq__(self, other):
+        if isinstance(other, Player):
+            return self.name == other.name
+        elif isinstance(other, str):
+            return self.name == other
+        else:
+            raise TypeError(f"Type '{type(other).__name__}' cannot be compared to type '{type(self).__name__}'")
+
+    def __ne__(self, other):
+        return not(self == other)
+
+    def __str__(self):
+        return self.name
+
+    def won():
+        self.score += 1
+
 def main(window):
-    score = {
-        "x": 0,
-        "o": 0
-    }
-
-    turn = random.choice(["x", "o"])
-
+    player = namedtuple("Players", ["X", "O"])(
+        Player("X"),
+        Player("O")
+    )
+    current_player = random.choice([player.X, player.O])
     winner = None
 
     board = [
@@ -57,8 +81,8 @@ def main(window):
             window.box()
 
             # scores
-            window.addstr(2, 2, f"x:{str(score['x'])}", curses.A_REVERSE if turn == "x" else curses.A_NORMAL)
-            window.addstr(2, 8, f"o:{str(score['o'])}", curses.A_REVERSE if turn == "o" else curses.A_NORMAL)
+            window.addstr(2, 2, f"{player.X}:{str(player.X.score)}", curses.A_REVERSE if current_player == player.X else curses.A_NORMAL)
+            window.addstr(2, 8, f"{player.O}:{str(player.O.score)}", curses.A_REVERSE if current_player == player.O else curses.A_NORMAL)
 
             # board
             window.addstr(6, 4, f"{board[0][0]}|{board[0][1]}|{board[0][2]}")
@@ -83,8 +107,9 @@ def main(window):
                     cursor_position_within_matrix[1] = (cursor_position_within_matrix[1] + 1) % 3
                 case curses.KEY_ENTER | 10:
                     if board[cursor_position_within_matrix[0]][cursor_position_within_matrix[1]] == " ":
-                        board[cursor_position_within_matrix[0]][cursor_position_within_matrix[1]] = turn
-                        turn = "x" if turn == "o" else "o"
+                        board[cursor_position_within_matrix[0]][cursor_position_within_matrix[1]] = current_player
+
+                        current_player = player.X if current_player == player.O else player.O
 
                     for i in range(0, 3):
                         if (board[i][0] == board[i][1] and board[i][1] == board[i][2] and board[i][0] != " "):
@@ -111,7 +136,7 @@ def main(window):
 
         # score screen
         if winner:
-            score[winner] += 1
+            winner.score += 1
 
         curses.curs_set(0)
         window.clear()
@@ -119,8 +144,8 @@ def main(window):
 
         window.addstr(3, 4, "score")
 
-        window.addstr(7, 1, f"x:{str(score['x'])}")
-        window.addstr(7, 8, f"{str(score['o'])}:o")
+        window.addstr(7, 1, f"{player.X}:{str(player.X.score)}")
+        window.addstr(7, 8, f"{str(player.O.score)}:{player.O}")
 
         if winner:
             window.addstr(9, 3, f"{winner}  won!")
@@ -139,7 +164,7 @@ def main(window):
                         return
 
                     winner = None
-                    turn = "x"
+                    current_player = random.choice([player.X, player.O])
 
                     board = [
                         [" ", " ", " "],

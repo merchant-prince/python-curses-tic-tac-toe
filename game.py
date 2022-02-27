@@ -144,8 +144,9 @@ def main(window):
             case curses.KEY_RIGHT:
                 cursor_position_within_matrix[1] = (cursor_position_within_matrix[1] + 1) % 3
             case curses.KEY_ENTER | 10:
-                turn = "x" if turn == "o" else "o"
-                continue
+                if board[cursor_position_within_matrix[0]][cursor_position_within_matrix[1]] == " ":
+                    board[cursor_position_within_matrix[0]][cursor_position_within_matrix[1]] = turn
+                    turn = "x" if turn == "o" else "o"
             case curses.KEY_Q:
                 pass
 

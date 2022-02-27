@@ -47,13 +47,76 @@ def main(window):
             case curses.KEY_LEFT | curses.KEY_RIGHT:
                 selected_glyph = 'o' if selected_glyph == 'x' else 'x'
 
-            case curses.KEY_ENTER | 10: # apparently curses.KEY_ENTER is unreliable. pressing the 'Enter' key yields the keycode 10. using both for a more consistent result
+            case curses.KEY_ENTER | 10:
+                """
+                apparently curses.KEY_ENTER is unreliable.
+                pressing the 'Enter' key yields the keycode 10.
+                using both for a more consistent result.
+                """
                 break
 
         window.refresh()
 
-    # game screen
+    score = {
+        "x": 0,
+        "o": 0
+    }
 
+    turn = "x"
+
+    winner = None
+
+    board = [
+        [" ", " ", " "],
+        [" ", " ", " "],
+        [" ", " ", " "]
+    ]
+
+    # game screen
+    window.clear()
+    window.box()
+
+    # scores
+    window.addch(2, 2, "x")
+    window.addch(2, 3, ":")
+    window.addch(2, 4, str(score["x"]))
+
+    window.addch(2, 8, str(score["o"]))
+    window.addch(2, 9, ":")
+    window.addch(2, 10, "o")
+
+    # board
+    window.addch(6, 4, board[0][0])
+    window.addch(6, 5, curses.ACS_VLINE)
+    window.addch(6, 6, board[0][1])
+    window.addch(6, 7, curses.ACS_VLINE)
+    window.addch(6, 8, board[0][2])
+
+    window.addch(7, 4, curses.ACS_HLINE)
+    window.addch(7, 5, "+")
+    window.addch(7, 6, curses.ACS_HLINE)
+    window.addch(7, 7, "+")
+    window.addch(7, 8, curses.ACS_HLINE)
+
+    window.addch(8, 4, board[1][0])
+    window.addch(8, 5, curses.ACS_VLINE)
+    window.addch(8, 6, board[1][1])
+    window.addch(8, 7, curses.ACS_VLINE)
+    window.addch(8, 8, board[1][2])
+
+    window.addch(9, 4, curses.ACS_HLINE)
+    window.addch(9, 5, "+")
+    window.addch(9, 6, curses.ACS_HLINE)
+    window.addch(9, 7, "+")
+    window.addch(9, 8, curses.ACS_HLINE)
+
+    window.addch(10, 4, board[2][0])
+    window.addch(10, 5, curses.ACS_VLINE)
+    window.addch(10, 6, board[2][1])
+    window.addch(10, 7, curses.ACS_VLINE)
+    window.addch(10, 8, board[2][2])
+
+    window.getch()
     # score screen
 
 wrapper(main)

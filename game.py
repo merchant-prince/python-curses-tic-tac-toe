@@ -173,6 +173,32 @@ def main(window):
         window.refresh()
 
     # score screen
+    if winner:
+        if winner == "x":
+            score["x"] += 1
+        elif winner == "o":
+            score["o"] += 1
+
     curses.curs_set(0)
+    window.clear()
+    window.box()
+
+    window.addstr(3, 4, "score")
+
+    window.addch(7, 1, "x")
+    window.addch(7, 2, ":")
+    window.addch(7, 3, str(score["x"]))
+
+    window.addch(7, 8, str(score["o"]))
+    window.addch(7, 9, ":")
+    window.addch(7, 10, "o")
+
+    if winner:
+        window.addstr(9, 2, f"{winner} won!")
+
+    winner = None
+
+    window.refresh()
+    window.getch()
 
 wrapper(main)

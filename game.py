@@ -1,68 +1,14 @@
 from curses import wrapper
 import curses
-
-WIDTH = 13
-HEIGHT = 15
+import random
 
 def main(window):
-    # init
-    curses.resizeterm(HEIGHT, WIDTH)
-    curses.curs_set(0)
-    window.getch()
-
-    # splash screen
-    window.clear()
-    window.box()
-
-    window.addstr(6, 2, "tic")
-    window.addstr(7, 5, "tac")
-    window.addstr(8, 8, "toe")
-
-    window.addstr(HEIGHT - 2, 3, "[enter]", curses.A_BLINK)
-
-    window.refresh()
-    window.getch()
-
-
-    # choice screen
-    window.clear()
-    window.box()
-
-    window.addstr(6, 3, "choose:")
-
-    window.addch(8, 4, "x")
-    window.addch(8, 8, "o")
-
-    selected_glyph = 'x'
-
-    while True:
-        if selected_glyph == 'x':
-            window.addch(8, 4, "x", curses.A_REVERSE)
-            window.addch(8, 8, "o")
-        else:
-            window.addch(8, 4, "x")
-            window.addch(8, 8, "o", curses.A_REVERSE)
-
-        match (key := window.getch()):
-            case curses.KEY_LEFT | curses.KEY_RIGHT:
-                selected_glyph = 'o' if selected_glyph == 'x' else 'x'
-
-            case curses.KEY_ENTER | 10:
-                """
-                apparently curses.KEY_ENTER is unreliable.
-                pressing the 'Enter' key yields the keycode 10.
-                using both for a more consistent result.
-                """
-                break
-
-        window.refresh()
-
     score = {
         "x": 0,
         "o": 0
     }
 
-    turn = "x"
+    turn = random.choice(["x", "o"])
 
     winner = None
 
@@ -85,6 +31,25 @@ def main(window):
 
     next_ = "c"
 
+    # initialize window
+    curses.resizeterm(15, 13)
+    curses.curs_set(0)
+    window.getch()
+
+    # splash screen
+    window.clear()
+    window.box()
+
+    window.addstr(6, 2, "tic")
+    window.addstr(7, 5, "tac")
+    window.addstr(8, 8, "toe")
+
+    window.addstr(12, 4, "[ → ]", curses.A_BLINK)
+
+    window.refresh()
+    window.getch()
+
+
     while next_ == "c":
         # game screen
         while not winner:
@@ -92,48 +57,18 @@ def main(window):
             window.box()
 
             # scores
-            window.addch(2, 2, "x", curses.A_REVERSE if turn == "x" else curses.A_NORMAL)
-            window.addch(2, 3, ":", curses.A_REVERSE if turn == "x" else curses.A_NORMAL)
-            window.addch(2, 4, str(score["x"]), curses.A_REVERSE if turn == "x" else curses.A_NORMAL)
-
-            window.addch(2, 8, str(score["o"]), curses.A_REVERSE if turn == "o" else curses.A_NORMAL)
-            window.addch(2, 9, ":", curses.A_REVERSE if turn == "o" else curses.A_NORMAL)
-            window.addch(2, 10, "o", curses.A_REVERSE if turn == "o" else curses.A_NORMAL)
+            window.addstr(2, 2, f"x:{str(score['x'])}", curses.A_REVERSE if turn == "x" else curses.A_NORMAL)
+            window.addstr(2, 8, f"o:{str(score['o'])}", curses.A_REVERSE if turn == "o" else curses.A_NORMAL)
 
             # board
-            window.addch(6, 4, board[0][0])
-            window.addch(6, 5, curses.ACS_VLINE)
-            window.addch(6, 6, board[0][1])
-            window.addch(6, 7, curses.ACS_VLINE)
-            window.addch(6, 8, board[0][2])
+            window.addstr(6, 4, f"{board[0][0]}|{board[0][1]}|{board[0][2]}")
+            window.addstr(7, 4, f"-+-+-")
+            window.addstr(8, 4, f"{board[1][0]}|{board[1][1]}|{board[1][2]}")
+            window.addstr(9, 4, f"-+-+-")
+            window.addstr(10, 4, f"{board[2][0]}|{board[2][1]}|{board[2][2]}")
 
-            window.addch(7, 4, curses.ACS_HLINE)
-            window.addch(7, 5, "+")
-            window.addch(7, 6, curses.ACS_HLINE)
-            window.addch(7, 7, "+")
-            window.addch(7, 8, curses.ACS_HLINE)
-
-            window.addch(8, 4, board[1][0])
-            window.addch(8, 5, curses.ACS_VLINE)
-            window.addch(8, 6, board[1][1])
-            window.addch(8, 7, curses.ACS_VLINE)
-            window.addch(8, 8, board[1][2])
-
-            window.addch(9, 4, curses.ACS_HLINE)
-            window.addch(9, 5, "+")
-            window.addch(9, 6, curses.ACS_HLINE)
-            window.addch(9, 7, "+")
-            window.addch(9, 8, curses.ACS_HLINE)
-
-            window.addch(10, 4, board[2][0])
-            window.addch(10, 5, curses.ACS_VLINE)
-            window.addch(10, 6, board[2][1])
-            window.addch(10, 7, curses.ACS_VLINE)
-            window.addch(10, 8, board[2][2])
-
-
-            # make cursor visible
             curses.curs_set(1)
+
             cursor_position = cursor_position_matrix[cursor_position_within_matrix[0]][cursor_position_within_matrix[1]]
             window.move(*cursor_position)
 
@@ -170,17 +105,13 @@ def main(window):
                         if (board[0][2] == board[1][1] and board[1][1] == board[2][0] and board[0][2] != " "):
                             winner = board[0][2]
 
-                case 27: # esc keycode
-                    pass
+                    # draw
 
             window.refresh()
 
         # score screen
         if winner:
-            if winner == "x":
-                score["x"] += 1
-            elif winner == "o":
-                score["o"] += 1
+            score[winner] += 1
 
         curses.curs_set(0)
         window.clear()
@@ -188,24 +119,15 @@ def main(window):
 
         window.addstr(3, 4, "score")
 
-        window.addch(7, 1, "x")
-        window.addch(7, 2, ":")
-        window.addch(7, 3, str(score["x"]))
-
-        window.addch(7, 8, str(score["o"]))
-        window.addch(7, 9, ":")
-        window.addch(7, 10, "o")
+        window.addstr(7, 1, f"x:{str(score['x'])}")
+        window.addstr(7, 8, f"{str(score['o'])}:o")
 
         if winner:
-            window.addstr(9, 2, f"{winner} won!")
+            window.addstr(9, 3, f"{winner}  won!")
 
         while True:
-            if next_ == 'c':
-                window.addch(10, 4, "c", curses.A_REVERSE)
-                window.addch(10, 8, "e")
-            else:
-                window.addch(10, 4, "c")
-                window.addch(10, 8, "e", curses.A_REVERSE)
+            window.addch(12, 4, "c", curses.A_REVERSE if next_ == "c" else curses.A_NORMAL)
+            window.addch(12, 8, "e", curses.A_REVERSE if next_ == "e" else curses.A_NORMAL)
 
             match (key := window.getch()):
                 case curses.KEY_LEFT | curses.KEY_RIGHT:
@@ -219,20 +141,14 @@ def main(window):
                     winner = None
                     turn = "x"
 
-                    winner = None
-
                     board = [
                         [" ", " ", " "],
                         [" ", " ", " "],
                         [" ", " ", " "]
                     ]
+
                     cursor_position_within_matrix = [0, 0]
 
-                    """
-                    apparently curses.KEY_ENTER is unreliable.
-                    pressing the 'Enter' key yields the keycode 10.
-                    using both for a more consistent result.
-                    """
                     break
 
 wrapper(main)

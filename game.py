@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+
 from collections import namedtuple
 from curses import wrapper
 import curses
@@ -30,7 +32,8 @@ class Player:
     def won():
         self.score += 1
 
-def main(window):
+
+def game(window):
     DRAW = 'draw'
 
     continue_playing = True
@@ -184,4 +187,6 @@ def main(window):
 
                     break
 
-wrapper(main)
+
+if __name__ == '__main__':
+    wrapper(game)

@@ -72,51 +72,80 @@ def main(window):
         [" ", " ", " "]
     ]
 
+    # positions represented as (y,x) coordinates
+    cursor_position_matrix = [
+        [(6, 4), (6, 6), (6, 8)],
+        [(8, 4), (8, 6), (8, 8)],
+        [(10, 4), (10, 6), (10, 8)],
+    ]
+
+    # referring to the index of the cursor position within the cursor_position_matrix as [a][b]
+    # SHOULD BE CONGRUENT WITH THE DATA-STRUCTURE OF THE BOARD
+    cursor_position_within_matrix = [0, 0]
+
     # game screen
-    window.clear()
-    window.box()
+    while not winner:
+        window.clear()
+        window.box()
 
-    # scores
-    window.addch(2, 2, "x")
-    window.addch(2, 3, ":")
-    window.addch(2, 4, str(score["x"]))
+        # scores
+        window.addch(2, 2, "x")
+        window.addch(2, 3, ":")
+        window.addch(2, 4, str(score["x"]))
 
-    window.addch(2, 8, str(score["o"]))
-    window.addch(2, 9, ":")
-    window.addch(2, 10, "o")
+        window.addch(2, 8, str(score["o"]))
+        window.addch(2, 9, ":")
+        window.addch(2, 10, "o")
 
-    # board
-    window.addch(6, 4, board[0][0])
-    window.addch(6, 5, curses.ACS_VLINE)
-    window.addch(6, 6, board[0][1])
-    window.addch(6, 7, curses.ACS_VLINE)
-    window.addch(6, 8, board[0][2])
+        # board
+        window.addch(6, 4, board[0][0])
+        window.addch(6, 5, curses.ACS_VLINE)
+        window.addch(6, 6, board[0][1])
+        window.addch(6, 7, curses.ACS_VLINE)
+        window.addch(6, 8, board[0][2])
 
-    window.addch(7, 4, curses.ACS_HLINE)
-    window.addch(7, 5, "+")
-    window.addch(7, 6, curses.ACS_HLINE)
-    window.addch(7, 7, "+")
-    window.addch(7, 8, curses.ACS_HLINE)
+        window.addch(7, 4, curses.ACS_HLINE)
+        window.addch(7, 5, "+")
+        window.addch(7, 6, curses.ACS_HLINE)
+        window.addch(7, 7, "+")
+        window.addch(7, 8, curses.ACS_HLINE)
 
-    window.addch(8, 4, board[1][0])
-    window.addch(8, 5, curses.ACS_VLINE)
-    window.addch(8, 6, board[1][1])
-    window.addch(8, 7, curses.ACS_VLINE)
-    window.addch(8, 8, board[1][2])
+        window.addch(8, 4, board[1][0])
+        window.addch(8, 5, curses.ACS_VLINE)
+        window.addch(8, 6, board[1][1])
+        window.addch(8, 7, curses.ACS_VLINE)
+        window.addch(8, 8, board[1][2])
 
-    window.addch(9, 4, curses.ACS_HLINE)
-    window.addch(9, 5, "+")
-    window.addch(9, 6, curses.ACS_HLINE)
-    window.addch(9, 7, "+")
-    window.addch(9, 8, curses.ACS_HLINE)
+        window.addch(9, 4, curses.ACS_HLINE)
+        window.addch(9, 5, "+")
+        window.addch(9, 6, curses.ACS_HLINE)
+        window.addch(9, 7, "+")
+        window.addch(9, 8, curses.ACS_HLINE)
 
-    window.addch(10, 4, board[2][0])
-    window.addch(10, 5, curses.ACS_VLINE)
-    window.addch(10, 6, board[2][1])
-    window.addch(10, 7, curses.ACS_VLINE)
-    window.addch(10, 8, board[2][2])
+        window.addch(10, 4, board[2][0])
+        window.addch(10, 5, curses.ACS_VLINE)
+        window.addch(10, 6, board[2][1])
+        window.addch(10, 7, curses.ACS_VLINE)
+        window.addch(10, 8, board[2][2])
 
-    window.getch()
+
+        # make cursor visible
+        curses.curs_set(1)
+        cursor_position = cursor_position_matrix[cursor_position_within_matrix[0]][cursor_position_within_matrix[1]]
+        window.move(*cursor_position)
+
+        match (key := window.getch()):
+            case curses.KEY_UP:
+                cursor_position_within_matrix[0] = (cursor_position_within_matrix[0] - 1) % 3
+            case curses.KEY_DOWN:
+                cursor_position_within_matrix[0] = (cursor_position_within_matrix[0] + 1) % 3
+            case curses.KEY_LEFT:
+                cursor_position_within_matrix[1] = (cursor_position_within_matrix[1] - 1) % 3
+            case curses.KEY_RIGHT:
+                cursor_position_within_matrix[1] = (cursor_position_within_matrix[1] + 1) % 3
+
+        window.refresh()
     # score screen
+    curses.curs_set(0)
 
 wrapper(main)

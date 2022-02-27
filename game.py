@@ -119,19 +119,15 @@ def main(window):
                             winner = board[i][0]
                             break
 
-                    if not winner:
-                        for j in range(0, 3):
-                            if (board[0][j] == board[1][j] and board[1][j] == board[2][j] and board[0][j] is not None):
-                                winner = board[0][j]
-                                break
+                        if (board[0][i] == board[1][i] and board[1][i] == board[2][i] and board[0][i] is not None):
+                            winner = board[0][i]
+                            break
 
                     if not winner:
-                        if (board[0][0] == board[1][1] and board[1][1] == board[2][2] and board[0][0] is not None):
-                            winner = board[0][0]
-
-                    if not winner:
-                        if (board[0][2] == board[1][1] and board[1][1] == board[2][0] and board[0][2] is not None):
-                            winner = board[0][2]
+                        if ((board[0][0] == board[1][1] and board[1][1] == board[2][2] and board[1][1] is not None) or
+                            (board[0][2] == board[1][1] and board[1][1] == board[2][0] and board[1][1] is not None)
+                        ):
+                            winner = board[1][1]
 
                     # draw
 

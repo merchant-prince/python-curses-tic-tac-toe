@@ -147,10 +147,31 @@ def main(window):
                 if board[cursor_position_within_matrix[0]][cursor_position_within_matrix[1]] == " ":
                     board[cursor_position_within_matrix[0]][cursor_position_within_matrix[1]] = turn
                     turn = "x" if turn == "o" else "o"
-            case curses.KEY_Q:
+
+                for i in range(0, 3):
+                    if (board[i][0] == board[i][1] and board[i][1] == board[i][2] and board[i][0] != " "):
+                        winner = board[i][0]
+                        break
+
+                if not winner:
+                    for j in range(0, 3):
+                        if (board[0][j] == board[1][j] and board[1][j] == board[2][j] and board[0][j] != " "):
+                            winner = board[0][j]
+                            break
+
+                if not winner:
+                    if (board[0][0] == board[1][1] and board[1][1] == board[2][2] and board[0][0] != " "):
+                        winner = board[0][0]
+
+                if not winner:
+                    if (board[0][2] == board[1][1] and board[1][1] == board[2][0] and board[0][2] != " "):
+                        winner = board[0][2]
+
+            case 27: # esc keycode
                 pass
 
         window.refresh()
+
     # score screen
     curses.curs_set(0)
 

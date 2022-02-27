@@ -16,6 +16,8 @@ class Player:
             return self.name == other.name
         elif isinstance(other, str):
             return self.name == other
+        elif other is None:
+            return False
         else:
             raise TypeError(f"Type '{type(other).__name__}' cannot be compared to type '{type(self).__name__}'")
 
@@ -37,9 +39,9 @@ def main(window):
     winner = None
 
     board = [
-        [" ", " ", " "],
-        [" ", " ", " "],
-        [" ", " ", " "]
+        [None, None, None],
+        [None, None, None],
+        [None, None, None],
     ]
 
     # positions represented as (y,x) coordinates
@@ -53,7 +55,7 @@ def main(window):
     # SHOULD BE CONGRUENT WITH THE DATA-STRUCTURE OF THE BOARD
     cursor_position_within_matrix = [0, 0]
 
-    next_ = "c"
+    continue_playing = True
 
     # initialize window
     curses.resizeterm(15, 13)
@@ -74,7 +76,7 @@ def main(window):
     window.getch()
 
 
-    while next_ == "c":
+    while continue_playing:
         # game screen
         while not winner:
             window.clear()
@@ -85,11 +87,11 @@ def main(window):
             window.addstr(2, 8, f"{player.O}:{str(player.O.score)}", curses.A_REVERSE if current_player == player.O else curses.A_NORMAL)
 
             # board
-            window.addstr(6, 4, f"{board[0][0]}|{board[0][1]}|{board[0][2]}")
+            window.addstr(6, 4, f"{board[0][0] or ' '}|{board[0][1] or ' '}|{board[0][2] or ' '}")
             window.addstr(7, 4, f"-+-+-")
-            window.addstr(8, 4, f"{board[1][0]}|{board[1][1]}|{board[1][2]}")
+            window.addstr(8, 4, f"{board[1][0] or ' '}|{board[1][1] or ' '}|{board[1][2] or ' '}")
             window.addstr(9, 4, f"-+-+-")
-            window.addstr(10, 4, f"{board[2][0]}|{board[2][1]}|{board[2][2]}")
+            window.addstr(10, 4, f"{board[2][0] or ' '}|{board[2][1] or ' '}|{board[2][2] or ' '}")
 
             curses.curs_set(1)
 
@@ -106,28 +108,28 @@ def main(window):
                 case curses.KEY_RIGHT:
                     cursor_position_within_matrix[1] = (cursor_position_within_matrix[1] + 1) % 3
                 case curses.KEY_ENTER | 10:
-                    if board[cursor_position_within_matrix[0]][cursor_position_within_matrix[1]] == " ":
+                    if board[cursor_position_within_matrix[0]][cursor_position_within_matrix[1]] is None:
                         board[cursor_position_within_matrix[0]][cursor_position_within_matrix[1]] = current_player
 
                         current_player = player.X if current_player == player.O else player.O
 
                     for i in range(0, 3):
-                        if (board[i][0] == board[i][1] and board[i][1] == board[i][2] and board[i][0] != " "):
+                        if (board[i][0] == board[i][1] and board[i][1] == board[i][2] and board[i][0] is not None):
                             winner = board[i][0]
                             break
 
                     if not winner:
                         for j in range(0, 3):
-                            if (board[0][j] == board[1][j] and board[1][j] == board[2][j] and board[0][j] != " "):
+                            if (board[0][j] == board[1][j] and board[1][j] == board[2][j] and board[0][j] is not None):
                                 winner = board[0][j]
                                 break
 
                     if not winner:
-                        if (board[0][0] == board[1][1] and board[1][1] == board[2][2] and board[0][0] != " "):
+                        if (board[0][0] == board[1][1] and board[1][1] == board[2][2] and board[0][0] is not None):
                             winner = board[0][0]
 
                     if not winner:
-                        if (board[0][2] == board[1][1] and board[1][1] == board[2][0] and board[0][2] != " "):
+                        if (board[0][2] == board[1][1] and board[1][1] == board[2][0] and board[0][2] is not None):
                             winner = board[0][2]
 
                     # draw
@@ -145,31 +147,31 @@ def main(window):
         window.addstr(3, 4, "score")
 
         window.addstr(7, 1, f"{player.X}:{str(player.X.score)}")
-        window.addstr(7, 8, f"{str(player.O.score)}:{player.O}")
+        window.addstr(7, 8, f"{player.O}:{str(player.O.score)}")
 
         if winner:
             window.addstr(9, 3, f"{winner}  won!")
 
         while True:
-            window.addch(12, 4, "c", curses.A_REVERSE if next_ == "c" else curses.A_NORMAL)
-            window.addch(12, 8, "e", curses.A_REVERSE if next_ == "e" else curses.A_NORMAL)
+            window.addch(12, 4, "x", curses.A_REVERSE if not continue_playing else curses.A_NORMAL)
+            window.addch(12, 8, "→", curses.A_REVERSE if continue_playing else curses.A_NORMAL)
 
             match (key := window.getch()):
                 case curses.KEY_LEFT | curses.KEY_RIGHT:
-                    next_ = 'c' if next_ == 'e' else 'e'
+                    continue_playing = False if continue_playing else True
                     window.refresh()
 
                 case curses.KEY_ENTER | 10:
-                    if next_ == 'e':
+                    if not continue_playing:
                         return
 
                     winner = None
                     current_player = random.choice([player.X, player.O])
 
                     board = [
-                        [" ", " ", " "],
-                        [" ", " ", " "],
-                        [" ", " ", " "]
+                        [None, None, None],
+                        [None, None, None],
+                        [None, None, None],
                     ]
 
                     cursor_position_within_matrix = [0, 0]

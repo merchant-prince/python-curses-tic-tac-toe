@@ -89,13 +89,13 @@ def main(window):
         window.box()
 
         # scores
-        window.addch(2, 2, "x")
-        window.addch(2, 3, ":")
-        window.addch(2, 4, str(score["x"]))
+        window.addch(2, 2, "x", curses.A_REVERSE if turn == "x" else curses.A_NORMAL)
+        window.addch(2, 3, ":", curses.A_REVERSE if turn == "x" else curses.A_NORMAL)
+        window.addch(2, 4, str(score["x"]), curses.A_REVERSE if turn == "x" else curses.A_NORMAL)
 
-        window.addch(2, 8, str(score["o"]))
-        window.addch(2, 9, ":")
-        window.addch(2, 10, "o")
+        window.addch(2, 8, str(score["o"]), curses.A_REVERSE if turn == "o" else curses.A_NORMAL)
+        window.addch(2, 9, ":", curses.A_REVERSE if turn == "o" else curses.A_NORMAL)
+        window.addch(2, 10, "o", curses.A_REVERSE if turn == "o" else curses.A_NORMAL)
 
         # board
         window.addch(6, 4, board[0][0])
@@ -143,6 +143,11 @@ def main(window):
                 cursor_position_within_matrix[1] = (cursor_position_within_matrix[1] - 1) % 3
             case curses.KEY_RIGHT:
                 cursor_position_within_matrix[1] = (cursor_position_within_matrix[1] + 1) % 3
+            case curses.KEY_ENTER | 10:
+                turn = "x" if turn == "o" else "o"
+                continue
+            case curses.KEY_Q:
+                pass
 
         window.refresh()
     # score screen

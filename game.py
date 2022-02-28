@@ -29,12 +29,9 @@ class Player:
     def __str__(self):
         return self.name
 
-    def won():
-        self.score += 1
-
 
 def game(window):
-    DRAW = 'draw'
+    DRAW_GAME = 'draw'
 
     continue_playing = True
 
@@ -47,8 +44,7 @@ def game(window):
 
     current_player = random.choice([player.X, player.O])
 
-    # referring to the index of the cursor position within cursor_position as [a][b]
-    # SHOULD BE CONGRUENT WITH THE DATA-STRUCTURE OF THE BOARD
+    # referring to the indices of the cursor position within cursor_position
     metaposition = [0, 0]
 
     # positions represented as (y,x) coordinates
@@ -85,7 +81,7 @@ def game(window):
 
     while continue_playing:
         # game screen
-        while (not winner) and (winner != DRAW):
+        while (not winner) and (winner != DRAW_GAME):
             window.clear()
             window.box()
 
@@ -104,7 +100,7 @@ def game(window):
 
             window.move(*cursor_position[metaposition[0]][metaposition[1]])
 
-            match (key := window.getch()):
+            match window.getch():
                 case curses.KEY_UP:
                     metaposition[0] = (metaposition[0] - 1) % 3
                 case curses.KEY_DOWN:
@@ -120,33 +116,28 @@ def game(window):
                         current_player = player.X if current_player == player.O else player.O
 
                     for i in range(0, 3):
-                        if (board[i][0] == board[i][1] and board[i][1] == board[i][2] and board[i][0] is not None):
+                        if board[i][0] == board[i][1] and board[i][1] == board[i][2] and board[i][0] is not None:
                             winner = board[i][0]
-
                             break
 
-                        if (board[0][i] == board[1][i] and board[1][i] == board[2][i] and board[0][i] is not None):
+                        if board[0][i] == board[1][i] and board[1][i] == board[2][i] and board[0][i] is not None:
                             winner = board[0][i]
-
                             break
 
                     if ((board[0][0] == board[1][1] and board[1][1] == board[2][2] and board[1][1] is not None) or
                         (board[0][2] == board[1][1] and board[1][1] == board[2][0] and board[1][1] is not None)
                     ):
                         winner = board[1][1]
-
                         break
 
                     if len(list(filter(lambda a: a == player.X or a == player.O, (board[i][j] for i in range(3) for j in range(3))))) == 9:
-                        winner = DRAW
-
+                        winner = DRAW_GAME
                         break
-
 
             window.refresh()
 
         # score screen
-        if winner and (winner != DRAW):
+        if winner and (winner != DRAW_GAME):
             winner.score += 1
 
         curses.curs_set(0)
@@ -158,14 +149,14 @@ def game(window):
         window.addstr(7, 2, f"{player.X}:{str(player.X.score)}")
         window.addstr(7, 8, f"{player.O}:{str(player.O.score)}")
 
-        if winner != DRAW:
+        if winner != DRAW_GAME:
             window.addstr(9, 3, f"{winner}  won!")
 
         while True:
             window.addch(12, 4, "x", curses.A_REVERSE if not continue_playing else curses.A_NORMAL)
             window.addch(12, 8, "→", curses.A_REVERSE if continue_playing else curses.A_NORMAL)
 
-            match (key := window.getch()):
+            match window.getch():
                 case curses.KEY_LEFT | curses.KEY_RIGHT:
                     continue_playing = False if continue_playing else True
                     window.refresh()
@@ -175,6 +166,7 @@ def game(window):
                         return
 
                     winner = None
+
                     current_player = random.choice([player.X, player.O])
 
                     board = [
